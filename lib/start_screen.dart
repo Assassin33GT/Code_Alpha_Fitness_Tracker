@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -17,18 +18,35 @@ class _StartScreenState extends State<StartScreen>{
   late Stream<PedestrianStatus> _pedestrianStatusStream;
   String _status = 'Unknown';
   int _step = 0;
-  int _steps = 0;
+  int _steps = -1;
+
+  Future<void> savedSteps(int _steps) async{
+    SharedPreferences prefs1 = await SharedPreferences.getInstance();
+    prefs1.setInt('_steps',_steps);
+  }
+
+  Future<int> getPrefs1() async{
+    final prefs1 = await SharedPreferences.getInstance();
+    return prefs1.getInt('_steps') ?? 0;
+  }
+  
+  Future<void> _loadSavedSteps() async {
+  _steps = await getPrefs1();
+  setState(() {});
+  }
 
   void requestPermission() async {
     if (await Permission.activityRecognition.isDenied) {
       await Permission.activityRecognition.request();
     }
   }
+
   @override
   void initState() {
     super.initState();
     requestPermission();
     initPlatformState();
+    _loadSavedSteps();
   }
 
   void initPlatformState() async{
@@ -47,6 +65,7 @@ class _StartScreenState extends State<StartScreen>{
   void onPedestrianStatusChanged(PedestrianStatus event) {
     setState(() {
       _status = event.status;
+      savedSteps(_steps);
     });
   }
 
