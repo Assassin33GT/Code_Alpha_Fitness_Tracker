@@ -18,6 +18,13 @@ class Screens extends StatefulWidget {
 }
 
 class _ScreensState extends State<Screens> {
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedData();
+  }
+
   var screenSwitch = 'start-screen';
   int currentLevel = 0;
   String nameOfLevel = 'Level 1';
@@ -28,104 +35,60 @@ class _ScreensState extends State<Screens> {
   List<int> completed = [0,0,0];
   List<int> check = [0,0,0];
   
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedCompletedS();
-    getPrefss();
-  }
+ 
 
-  Future<void> savedCompleted(List<int> completed, List<int> check, List<int>finished1, List<int>finished2, List<int>finished3) async{
-    SharedPreferences prefs2 = await SharedPreferences.getInstance();
-    SharedPreferences prefs3 = await SharedPreferences.getInstance();
-    SharedPreferences prefs4 = await SharedPreferences.getInstance();
+  Future<void> saveData() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    SharedPreferences prefs5 = await SharedPreferences.getInstance();
-    SharedPreferences prefs6 = await SharedPreferences.getInstance();
-    SharedPreferences prefs7 = await SharedPreferences.getInstance();
-
-    List<SharedPreferences> prefss = [];
-
-    for(int i = 0;i<30;i++)
+    for(int i = 0;i < 30;i++)
     {
-      prefss[i] = await SharedPreferences.getInstance();
-    }
-    for(int i = 0;i<30;i++)
-    {
-      if(i >= 0 && i < 10){
-        prefss[i].setInt('finished${[i]}', finished1[i]);
+      if(i < 10){
+        prefs.setInt('finished$i', noOfLevel[0].finished[i]);
       }
-      if(i >= 10 && i < 20){
-        prefss[i].setInt('finished${[i]}', finished2[i - 10]);
+      else if(i < 20){
+        prefs.setInt('finished$i', noOfLevel[1].finished[i - 10]);
       }
-      if(i >= 20 && i < 30){
-        prefss[i].setInt('finished${[i]}', finished3[i - 20]);
+      else if(i < 30){
+        prefs.setInt('finished$i', noOfLevel[2].finished[i - 20]);
       }
     }
-    prefs2.setInt('completed1',completed[0]);
-    prefs3.setInt('completed2',completed[1]);
-    prefs4.setInt('completed3',completed[2]);
+    prefs.setInt('completed1',completed[0]);
+    prefs.setInt('completed2',completed[1]);
+    prefs.setInt('completed3',completed[2]);
 
-    prefs5.setInt('check1', check[0]);
-    prefs6.setInt('check2', check[1]);
-    prefs7.setInt('check3', check[2]);
+    prefs.setInt('check1', check[0]);
+    prefs.setInt('check2', check[1]);
+    prefs.setInt('check3', check[2]);
 
-  }
-
-  Future<void> getPrefss() async{
-    final prefss = [];
-
-    for(int i = 0;i<30;i++)
-    {
-      prefss[i] = await SharedPreferences.getInstance();
-    }
-    for(int i = 0;i<30;i++)
-    {
-      if(i >= 0 && i < 10){
-        noOfLevel[0].finished[i] = prefss[i].getInt('finished${[i]}');
-      }
-      if(i >= 10 && i < 20){
-        noOfLevel[1].finished[i] = prefss[i].getInt('finished${[i]}');
-      }
-      if(i >= 20 && i < 30){
-        noOfLevel[2].finished[i] = prefss[i].getInt('finished${[i]}');
-      }
-    }
-  }
-
-  Future<int> getPrefs2() async{
-    final prefs2 = await SharedPreferences.getInstance();
-    return prefs2.getInt('completed1') ?? 0;
-  }
-  Future<int> getPrefs3() async{
-    final prefs3 = await SharedPreferences.getInstance();
-    return prefs3.getInt('completed2') ?? 0;
-  }
-  Future<int> getPrefs4() async{
-    final prefs4 = await SharedPreferences.getInstance();
-    return prefs4.getInt('completed3') ?? 0;
-  }
-  Future<int> getPrefs5() async{
-    final prefs5 = await SharedPreferences.getInstance();
-    return prefs5.getInt('check1') ?? 0;
-  }
-  Future<int> getPrefs6() async{
-    final prefs6 = await SharedPreferences.getInstance();
-    return prefs6.getInt('check2') ?? 0;
-  }
-  Future<int> getPrefs7() async{
-    final prefs7 = await SharedPreferences.getInstance();
-    return prefs7.getInt('check3') ?? 0;
+    prefs.setInt('currentLevel',currentLevel);
   }
   
-  Future<void> _loadSavedCompletedS() async {
-    completed[0] = await getPrefs2();
-    completed[1] = await getPrefs3();
-    completed[2] = await getPrefs4();
 
-    check[0] = await getPrefs5();
-    check[1] = await getPrefs6();
-    check[2] = await getPrefs7();
+  Future<void> _loadSavedData() async {
+   SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    for (int i = 0; i < 30; i++) {
+      int? value = prefs.getInt('finished$i');
+      if (value != null) {
+        if (i < 10) {
+          noOfLevel[0].finished[i] = value;
+        } else if (i < 20) {
+          noOfLevel[1].finished[i - 10] = value;
+        } else {
+          noOfLevel[2].finished[i - 20] = value;
+        }
+      }
+    }
+
+    completed[0] = prefs.getInt('completed1') ?? 0;
+    completed[1] = prefs.getInt('completed2') ?? 0;
+    completed[2] = prefs.getInt('completed3') ?? 0;
+
+    check[0] = prefs.getInt('check1') ?? 0;
+    check[1] = prefs.getInt('check2') ?? 0;
+    check[2] = prefs.getInt('check3') ?? 0;
+
+    currentLevel = prefs.getInt('currentLevel') ?? 0;
 
     setState(() {});
   }
@@ -133,7 +96,7 @@ class _ScreensState extends State<Screens> {
   void switchScreen(String screen) {
     setState(() {
       screenSwitch = screen;
-      savedCompleted(completed, check, noOfLevel[0].finished, noOfLevel[1].finished, noOfLevel[2].finished);
+      saveData();
     });
   }
 
@@ -151,7 +114,7 @@ class _ScreensState extends State<Screens> {
         nameOfLevel = 'Level 1';
         nameOfNextLevel = 'Level 2';
       }
-      savedCompleted(completed, check, noOfLevel[0].finished, noOfLevel[1].finished, noOfLevel[2].finished);
+      saveData();
     });
   }
 
@@ -159,14 +122,14 @@ class _ScreensState extends State<Screens> {
     setState(() {
       this.index = index;
       screenSwitch = 'exercise-screen';
-      savedCompleted(completed, check, noOfLevel[0].finished, noOfLevel[1].finished, noOfLevel[2].finished);
+      saveData();
     });
   }
 
   void goBackToGoals() {
     setState(() {
       screenSwitch = 'goal-screen';
-      savedCompleted(completed, check, noOfLevel[0].finished, noOfLevel[1].finished, noOfLevel[2].finished);
+      saveData();
     });
   }
 
@@ -175,7 +138,7 @@ class _ScreensState extends State<Screens> {
       if(noOfLevel[currentLevel].finished[x] < 2){
         noOfLevel[currentLevel].finished[x]++;
       }
-      savedCompleted(completed, check, noOfLevel[0].finished, noOfLevel[1].finished, noOfLevel[2].finished);
+      saveData();
     });
   }
 
@@ -184,11 +147,8 @@ class _ScreensState extends State<Screens> {
       for(int i = 0; i<completed.length; i++){
         completed[i] = 0;
       }
-      /*levels[0].finished = [0,0,0,0,0,0,0,0,0,0];
-      levels[1].finished = [0,0,0,0,0,0,0,0,0,0];
-      levels[2].finished = [0,0,0,0,0,0,0,0,0,0];*/
       currentLevel = 0;
-      savedCompleted(completed, check, noOfLevel[0].finished, noOfLevel[1].finished, noOfLevel[2].finished);
+      saveData();
     });
   }
 
