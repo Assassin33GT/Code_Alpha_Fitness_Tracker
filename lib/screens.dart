@@ -214,6 +214,7 @@ class _ScreensState extends State<Screens> {
     });
     
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
                   title: const SizedBox(
