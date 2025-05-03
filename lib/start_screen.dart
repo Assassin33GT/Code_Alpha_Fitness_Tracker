@@ -21,6 +21,7 @@ class _StartScreenState extends State<StartScreen>{
   int _steps = -1;
 
   Future<void> savedSteps(int _steps) async{
+    print(_step);
     SharedPreferences prefs1 = await SharedPreferences.getInstance();
     prefs1.setInt('_steps',_steps);
   }
