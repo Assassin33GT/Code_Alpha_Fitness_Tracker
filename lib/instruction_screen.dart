@@ -7,7 +7,7 @@ class InstructionScreen extends StatelessWidget {
   Widget getText(String tx){
     return Text(
       tx,
-      style: GoogleFonts.lato(
+      style: GoogleFonts.akayaTelivigala(
         fontSize: 22,
         color: Colors.white,
       ),
