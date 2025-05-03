@@ -51,10 +51,14 @@ class GoalsScreen extends StatelessWidget {
 
   Widget getImage(String im){
     return
-      Image.asset(
-            im,
-            width: 300,
-            );
+      ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+              im,
+              width: 300,
+              fit: BoxFit.fill,
+              ),
+      );
   }
 
   MaterialColor changeColor() {
